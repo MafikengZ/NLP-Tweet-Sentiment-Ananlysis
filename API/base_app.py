@@ -40,13 +40,12 @@ image = Image.open("C:/Users/Mpilenhle/Documents/EDSA/Classification/classificat
 
 # The main function where we will build the actual app
 def main():
-    """Tweet Classifier App with Streamlit """
+    """Tweet Classifier App \with Streamlit """
 
     # Creates a main title and subheader on your page -
     # these are static across all pages
 
     st.title("Tweet Classifer")
-    st.image(image, caption='The futer of and now', width = 650)
 
     st.subheader("Climate change tweet classification")
 
@@ -60,31 +59,38 @@ def main():
         
     # Building out the "Information" page
     if selection == "Information":
+
+        st.image(image, caption='The futer of and now', width = 650)
+
         st.info("The Values of the Labes: 1 : Believes in Climate,\n 0 : Neutral about climate change, \n 2 : News facts about climate,\n -1 :  does not believe in climate change")
         # You can read a markdown file from supporting resources folder
         st.markdown("Some information here")
 
         # Create two columns one for bar chart and one for raw data
-        col_1, col_2 = st.columns([3, 2])
-
         # Create a bar chart for the column of sentiment value counts                
-        with col_1:
-            st.subheader("Sentiment count bar chart")
-            data = raw['sentiment'].value_counts()
-            st.bar_chart(data)
+        st.subheader("Sentiment count bar chart")
+        data = raw['sentiment'].value_counts()
+        st.bar_chart(data)
 
-        with col_2:
-            # Create a second column with raw data
-            st.subheader("Raw data")
-            st.write(raw[['sentiment', 'message']]) # will write the df to the page
+        # Create a second column with raw data
+        st.subheader("Raw data")
+        st.write(raw[['sentiment', 'message']]) # will write the df to the page
 
     # Building out the predication page
     if selection == "Prediction":
 
         
         # choosing the algorithm
-        algo_option = ["Linear_Logistics", "Decision_Tree", "Naive_Bayes", "SVM_poly", "Logistics_ovr" ]
+        algo_option = ["Linear_Logistics", "SVM_Linear", "Naive_Bayes", "SVM_poly", "Logistics_ovr" ]
         algo_selection = st.sidebar.selectbox("Choose An Algorith of choice", algo_option)
+
+        st.markdown("""
+                        | Sentiment     | Meaning       | 
+                        | ------------- |:-------------:| 
+                        | 1             | Pro believers |
+                        | 2             | News facts    |   
+                        | 0             | Neutral tweet |
+                        | -1            | Non belivers  |    """)
 
         st.info("Predicting with a " + algo_selection +  " Model")
         # Creating a text box for user input
@@ -96,7 +102,7 @@ def main():
                 pred = joblib.load(open(os.path.join("C:/Users/Mpilenhle/Documents/EDSA/Classification/classification-predict-streamlit-model/resources/Logistic_regression.pkl"),"rb"))
 
         # Creating the selection for the other algorithms
-        if algo_selection == 'Decision_Tree':
+        if algo_selection == 'SVM_Linear':
                 pred = joblib.load(open(os.path.join("C:/Users/Mpilenhle/Documents/EDSA/Classification/classification-predict-streamlit-model/resources/SVC_linear.pkl"),"rb"))
                 
         # Creating the selection for the other algorithms
@@ -122,10 +128,13 @@ def main():
             predictor = pred
             prediction = predictor.predict(vect_text)
 
+            output = {0 : 'Neutral tweet', 1 : 'Pro Believer', 2 : 'News facts', -1 : 'Anti believer'}
+                    
+
             # When model has successfully run, will print prediction
             # You can use a dictionary or similar structure to make this output
             # more human interpretable.
-            st.success("Text Categorized as: {}".format(prediction))
+            st.success("Text Categorized as: {}".format(output[prediction[0]]))
 
 # Required to let Streamlit instantiate our web app.  
 if __name__ == '__main__':
