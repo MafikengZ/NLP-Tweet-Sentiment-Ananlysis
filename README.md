@@ -6,7 +6,7 @@ Providing an accurate and robust solution to this task gives companies access to
 
 High-level description of the files present in this GitHub Repository:
 
-| File Name | Description |
+| File Name |Description |
 | :---        |          ---: |
 | Team_12_JHB-Classification-Notebook.ipynb|	Contains exploratory data analysis and model selection for twitter sentiment analysis| 
 	
