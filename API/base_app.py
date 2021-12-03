@@ -36,7 +36,7 @@ tweet_cv = joblib.load(news_vectorizer) # loading your vectorizer from the pkl f
 # Load your raw data
 raw = pd.read_csv("resources/train.csv")
 
-image = Image.open("C:/Users/Mpilenhle/Documents/EDSA/Classification/classification-predict-streamlit-model/resources/imgs/worl.jpg")
+image = Image.open("https://github.com/MafikengZ/NLP-Tweet-Sentiment-Ananlysis.git/API/resources/imgs/worl.jpg")
 
 # The main function where we will build the actual app
 def main():
@@ -99,23 +99,23 @@ def main():
         
         # Selecting a Linear Logistic regression
         if algo_selection == 'Linear_Logistics':
-                pred = joblib.load(open(os.path.join("C:/Users/Mpilenhle/Documents/EDSA/Classification/classification-predict-streamlit-model/resources/Logistic_regression.pkl"),"rb"))
+                pred = joblib.load(open(os.path.join("https://github.com/MafikengZ/NLP-Tweet-Sentiment-Ananlysis.git/API/resources/Logistics_ovr.pkl"),"rb"))
 
         # Creating the selection for the other algorithms
         if algo_selection == 'SVM_Linear':
-                pred = joblib.load(open(os.path.join("C:/Users/Mpilenhle/Documents/EDSA/Classification/classification-predict-streamlit-model/resources/SVC_linear.pkl"),"rb"))
+                pred = joblib.load(open(os.path.join("https://github.com/MafikengZ/NLP-Tweet-Sentiment-Ananlysis.git/API/resources/SVC_linear.pkl"),"rb"))
                 
         # Creating the selection for the other algorithms
         if algo_selection == 'Naive_Bayes':
-                pred = joblib.load(open(os.path.join("C:/Users/Mpilenhle/Documents/EDSA/Classification/classification-predict-streamlit-model/resources/guassian.pkl"),"rb"))
+                pred = joblib.load(open(os.path.join("https://github.com/MafikengZ/NLP-Tweet-Sentiment-Ananlysis.git/API/resources/SVC_linear.pkl"),"rb"))
 
         # Creating the selection for the other algorithms
         if algo_selection == 'Logistics_ovr':
-                pred = joblib.load(open(os.path.join("C:/Users/Mpilenhle/Documents/EDSA/Classification/classification-predict-streamlit-model/resources/Logistics_ovr.pkl"),"rb"))
+                pred = joblib.load(open(os.path.join("https://github.com/MafikengZ/NLP-Tweet-Sentiment-Ananlysis.git/API/resources/Logistics_ovr.pkl"),"rb"))
 
         # Creating the selection for the other algorithms
         if algo_selection == 'SVM_poly':
-                pred = joblib.load(open(os.path.join("C:/Users/Mpilenhle/Documents/EDSA/Classification/classification-predict-streamlit-model/resources/SVC_poly.pkl"),"rb"))
+                pred = joblib.load(open(os.path.join("https://github.com/MafikengZ/NLP-Tweet-Sentiment-Ananlysis.git/API/resources/SVC_poly.pkl"),"rb"))
 
 
                                                         
