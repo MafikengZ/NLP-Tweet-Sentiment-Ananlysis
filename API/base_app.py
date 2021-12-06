@@ -134,23 +134,27 @@ def main():
         #remmoving the emojis
         pattern_url = r'http[s]?://[A-Za-z0-9/.]+'
         subs_url = r'url-web'
-        raw['clean_messages'] = raw['no_emoji'].replace(to_replace = pattern_url, value = subs_url, regex = True)
+        raw['clean_messages'] = raw['no_emoji'].replace(to_replace = pattern_url,
+                                                        value = subs_url, regex = True)
 
         #remmoving the uknown charecters from words
         pattern_url = r'[^A-Za-z ]'
         subs_url = r''
-        raw['clean_messages'] = raw['clean_messages'].replace(to_replace = pattern_url, value = subs_url, regex = True)
+        raw['clean_messages'] = raw['clean_messages'].replace(to_replace = pattern_url,
+                                                              value = subs_url, regex = True)
 
         #remmoving the digits
         pattern_url = r'\d'
         subs_url = r''
-        raw['clean_messages'] = raw['clean_messages'].replace(to_replace = pattern_url, value = subs_url, regex = True)
+        raw['clean_messages'] = raw['clean_messages'].replace(to_replace = pattern_url,
+                                                              value = subs_url, regex = True)
 
 
         #remmoving the Re Tweets
         pattern_url = r'rt\s'
         subs_url = r''
-        raw['clean_messages'] = raw['clean_messages'].replace(to_replace = pattern_url, value = subs_url, regex = True)
+        raw['clean_messages'] = raw['clean_messages'].replace(to_replace = pattern_url,
+                                                              value = subs_url, regex = True)
 
 
         # tokenizing the tweets
@@ -173,26 +177,24 @@ def main():
 
         st.info("Predicting with a " + algo_selection +  " Model")
         # Creating a text box for user input
-        tweet_text = st.text_area("Enter Text","Type Here")
+        tweet_text = st.text_area("Enter Text","Type Here ")
 
 
         # Selecting a Linear Logistic regression
         if algo_selection == 'Linear_Logistics':
-                pred = joblib.load(open(os.path.join("resources/Linear_Logistics_final_3.pkl"),"rb"))
+            pred = joblib.load(open(os.path.join("resources/Linear_Logistics_final_3.pkl"),"rb"))
 
         # Creating the selection for the other algorithms
         if algo_selection == 'SVM_Linear':
-                pred = joblib.load(open(os.path.join("resources/SVC_linear_final_3.pkl"),"rb"))
+            pred = joblib.load(open(os.path.join("resources/SVC_linear_final_4.pkl"),"rb"))
                 
         # Creating the selection for the other algorithms
         if algo_selection == 'Naive_Bayes':
-                pred = joblib.load(open(os.path.join("resources/MultiNB_final_3.pkl"),"rb"))
+            pred = joblib.load(open(os.path.join("resources/MultiNB_final_3.pkl"),"rb"))
 
-        
- 
-                                                        
 
         if st.button("Classify"):
+            col1, col2 = st.beta_columns(2)
             # Transforming user input with vectorizer
             vect_text = tweet_cv.transform([tweet_text]).toarray()
             # Load your .pkl file with the model of your choice + make predictions
@@ -209,30 +211,56 @@ def main():
             # more human interpretable.
             st.success("Text Categorized as: {}".format(output[prediction[0]]))
 
-            # creating polarity and subjectivity list
-            polarity_subjectivity = [TextBlob(tweet_text).sentiment[0], TextBlob(tweet_text).sentiment[1]]
+            with col1:
+                probs = predictor.predict_proba(vect_text)
+
+                # info about polarity and subjectivity
+                st.markdown("The Polarity and subjectivity plots helps verify the sentiment by either "
+                            "being a negative sentiment if the graph is negative and the subjectivity to help"
+                            " predict how factual ones statement is, sometimes it cannot get sentiments of "
+                            "words if there is word that helps with defining the tensity of the situation")
+
+                # Making the graphs
+                prob_df = pd.DataFrame(probs, columns =  predictor.classes_).T.reset_index()
+
+                prob_df.columns = ['Classes', 'Probability']
+
+                fig = alt.Chart(prob_df).mark_bar(color="Blue").encode(
+                    x='Classes',
+                    y='Probability'
+                ).properties(title="Prediction Probability plot").interactive()
+
+                st.altair_chart(fig)
+
+            with col2:
+
+                # creating polarity and subjectivity list
+                polarity_subjectivity = [TextBlob(tweet_text).sentiment[0], TextBlob(tweet_text).sentiment[1]]
+
+                # info about polarity and subjectivity
+                st.markdown("The Polarity and subjectivity plots helps verify the sentiment by either "
+                            "being a negative sentiment if the graph is negative and the subjectivity to help"
+                            " predict how factual ones statement is, sometimes it cannot get sentiments of "
+                            "words if there is word that helps with defining the tensity of the situation")
+
+                # Making the graphs
+                data_set = {
+                    'countries': ['Polarity', 'Subjectivity'],
+                    'values': polarity_subjectivity
+                }
+
+                df = pd.DataFrame(data_set)
+
+                line = alt.Chart(df).mark_bar(color="Blue").encode(
+                    x='countries',
+                    y='values'
+                ).properties(width = 450, height = 350, title = "Polarity and Subjectivity plot").interactive()
+
+                st.altair_chart(line)
 
 
-            #
-            st.markdown("The Polarity and subjectivity plots helps verify the sentiment by either "
-                        "being a negative sentiment if the graph is negative and the subjectivity to help"
-                        " predict how factual ones statement is, sometimes it cannot get sentiments of "
-                        "words if there is word that helps with defining the tensity of the situation")
 
-            # Making the graphs
-            data_set = {
-                'countries': ['Polarity', 'Subjectivity'],
-                'values': polarity_subjectivity
-            }
 
-            df = pd.DataFrame(data_set)
-
-            line = alt.Chart(df).mark_bar(color="Blue").encode(
-                x='countries',
-                y='values'
-            ).properties(width=650, height=400, title="Polarity and Subjectivity plot").interactive()
-
-            st.altair_chart(line)
 
 # Required to let Streamlit instantiate our web app.  
 if __name__ == '__main__':
