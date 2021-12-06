@@ -39,4 +39,4 @@ The dataset aggregates tweets pertaining to climate change collected between Apr
 
 
 
-Blessing Mvana Nhlozi, Mpilenhle Hlatshwayo, Sello Mafikeng, Rebecca Kekana, Anga Mandiyata
+```Blessing Mvana Nhlozi, Mpilenhle Hlatshwayo, Sello Mafikeng, Rebecca Kekana, Anga Mandiyata```
