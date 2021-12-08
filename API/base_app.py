@@ -54,23 +54,23 @@ tweet_cv = joblib.load(news_vectorizer) # loading your vectorizer from the pkl f
 raw = pd.read_csv("resources/train.csv")
 
 # Load Anti class data
-anti_hash = pd.read_csv("resources/data/df_Anti_hashtags.csv")
-anti_retweet = pd.read_csv("resources/data/df_Anti_retweets.csv")
+anti_hash = pd.read_csv("https://raw.githubusercontent.com/MafikengZ/NLP-Tweet-Sentiment-Ananlysis/main/API/resources/data/df_anti_hashtags.csv")
+anti_retweet = pd.read_csv("https://raw.githubusercontent.com/MafikengZ/NLP-Tweet-Sentiment-Ananlysis/main/API/resources/data/df_Anti_retweets.csv")
 
 # Load Anti class data
-neutral_hash = pd.read_csv("resources/data/df_Neutral_hashtags.csv")
-neutral_retweet = pd.read_csv("resources/data/df_Neutral_retweet.csv")
+neutral_hash = pd.read_csv("https://raw.githubusercontent.com/MafikengZ/NLP-Tweet-Sentiment-Ananlysis/main/API/resources/data/df_Neutral_hashtags.csv")
+neutral_retweet = pd.read_csv("https://raw.githubusercontent.com/MafikengZ/NLP-Tweet-Sentiment-Ananlysis/main/API/resources/data/df_Neutral_retweet.csv")
 
 # Load Anti class data
-pro_hash = pd.read_csv("resources/data/df_Pro_hashtags.csv")
-pro_retweet = pd.read_csv("resources/data/df_Pro_retweets.csv")
+pro_hash = pd.read_csv("https://raw.githubusercontent.com/MafikengZ/NLP-Tweet-Sentiment-Ananlysis/main/API/resources/data/df_Pro_hashtags.csv")
+pro_retweet = pd.read_csv("https://raw.githubusercontent.com/MafikengZ/NLP-Tweet-Sentiment-Ananlysis/main/API/resources/data/df_Pro_retweets.csv")
 
 # Load Anti class data
-news_hash = pd.read_csv("resources/data/df_News_hashtags.csv")
-news_retweet = pd.read_csv("resources/data/df_News_retweets.csv")
+news_hash = pd.read_csv("https://raw.githubusercontent.com/MafikengZ/NLP-Tweet-Sentiment-Ananlysis/main/API/resources/data/df_News_hashtags.csv")
+news_retweet = pd.read_csv("https://raw.githubusercontent.com/MafikengZ/NLP-Tweet-Sentiment-Ananlysis/main/API/resources/data/df_News_retweets.csv")
 
 # Load word count dataframe
-token_df = pd.read_csv("resources/data/df_token_ind.csv")
+token_df = pd.read_csv("https://raw.githubusercontent.com/MafikengZ/NLP-Tweet-Sentiment-Ananlysis/main/API/resources/data/df_token_ind.csv")
 
 
 
