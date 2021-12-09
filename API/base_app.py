@@ -73,10 +73,10 @@ news_retweet = pd.read_csv("https://raw.githubusercontent.com/MafikengZ/NLP-Twee
 token_df = pd.read_csv("https://raw.githubusercontent.com/MafikengZ/NLP-Tweet-Sentiment-Ananlysis/main/API/resources/data/df_token_ind.csv")
 
 #getting the analysis data frame
-clean_df = pd.read_csv('resources/data/clean_df.csv')
+clean_df = pd.read_csv('https://raw.githubusercontent.com/MafikengZ/NLP-Tweet-Sentiment-Ananlysis/main/API/resources/data/clean_df.csv')
 
 def plot_target_based_features(feature):
-    fig, ax = plt.subplots(1,1,'all', figsize = (20, 16))
+    fig, ax = plt.subplots(1,1,'all', figsize = (15, 9))
     # create data frames for classes
     x1 = clean_df[clean_df['sentiment'] == 1][feature]
     x2 = clean_df[clean_df['sentiment'] == 2][feature]
@@ -85,6 +85,7 @@ def plot_target_based_features(feature):
     #plt.figure(1, figsize = (16, 8))
     plt.xlabel('number of charecters in a tweet')
     plt.ylabel('number of tweets')
+    plt.title('Word distribution chart')
 
     _ = plt.hist(x1, alpha = 0.5, color = 'grey', bins = 50, label = 'belivers')
     _ = plt.hist(x2, alpha = 0.5, color = 'blue', bins = 50, label = 'news')
@@ -118,6 +119,7 @@ def main():
 
     st.title("Tweet Sentiment Classifier")
     st.subheader("There Is Only One Earth And One Life")
+    st.write('let us make the right choice')
 
     # Creating sidebar with selection box -
     # you can create multiple pages this way
@@ -128,9 +130,6 @@ def main():
     # Building out the "Information" page
     if selection == "Information":
         st.write('The war of good and evil between believers and non believers')
-
-        st.write("This page helps the user with the analysis of the most trending tweets, the trending  hashtags "
-                 "and trending topics in the classes")
 
         # Create and generate a word cloud image:
         wordcloud_pro = WordCloud(max_font_size=50, max_words=100,
@@ -155,8 +154,6 @@ def main():
         #copy of the data frame
         df_token = token_df.copy()
 
-
-
         #making the class analysis
         class_options = ["Class Pro", "Class News", "Class Neutral", "Class Anti", "overall analysis"]
         class_selection = st.sidebar.selectbox("Choose Class Analysis", class_options)
@@ -164,6 +161,8 @@ def main():
 
         if class_selection == "Class Pro":
             #creating a page for the class pro
+            st.write("This page helps the user with the analysis of the most trending tweets, the trending  hashtags "
+                     "and trending topics in the classes in Class Pro")
 
             # Creating a bar chart for the 25 most occurring words of class 1
             class_1_data = df_token.sort_values('1', ascending = False).head(25)
@@ -216,6 +215,8 @@ def main():
                 st.write(pro_hash.value_counts())
 
         if class_selection == "Class News":
+            st.write("This page helps the user with the analysis of the most trending tweets, the trending  hashtags "
+                     "and trending topics in the classes in the Class News")
 
             # Creating a bar chart for the 25 most occurring words of class 2
             class_2_data = df_token.sort_values('2', ascending = False).head(25)
@@ -271,19 +272,34 @@ def main():
                 st.write(news_hash.value_counts())
 
         if class_selection == "overall analysis":
+            st.write("This page helps the user with the analysis of all the classes combined to make a better "
+                     "distribution of how data is distributed")
             # Create a bar chart for the column of sentiment value counts
             st.subheader("Sentiment Class count bar chart")
+            st.write('The data distribution shows imbalance amongst the classes the positive class having'
+                     ' the most data')
             data = raw['sentiment'].value_counts()
             st.bar_chart(data)
 
             # getting the lengths of tweets distribution
+            st.subheader("What is the average length of Tweets from each class")
+            st.write('Curiosity leads to asking what length of characters does each class use to voice out their '
+                     'opinions in the fight of global warming, or their disbelief in it.')
             g1 = plot_target_based_features('length')
 
-
+            st.subheader("What is the average number of words in a Tweet")
+            st.write('Curiosity leads to asking how many words does each class use to voice out their '
+                     'opinions in the fight of global warming, or their disbelief in it. with this information we can '
+                     'strt thinking about how much each community shares, cause you only share when you '
+                     'have something to share')
             # getting the length of number of words in a tweet
             g2 = plot_target_based_features('no_words')
 
-
+            st.subheader("What is the average number of unique words in a Tweet")
+            st.write('with the unique number of words we can try to find the vocabulary of these classes '
+                     'but it seems as if the average number of unique words used by the believers are more, '
+                     'interestingly followed by the Neutral the anti believers and then the news,'
+                     'you would think the news would have more to say')
             #Getting the number of unique words distribution
             g3 = plot_target_based_features('unique_words')
 
@@ -424,6 +440,7 @@ def main():
                          " we are giving to the features. Since the logistic regression algorithm is not a multi " \
                          "class algorithm, we use the `multi` option of the algorithm to create a classification," \
                          " for all the classes."
+            st.write(model_info)
 
 
         # Creating the selection for the other algorithms
@@ -434,6 +451,7 @@ def main():
                          "classes. The plane is fitted in the middle of the classes, and where it " \
                          "touches on either sides of the classes, we call that the supports of the planes, " \
                          "this makes it less vulnerable to outliers, not unless the supports are moved"
+            st.write(model_info)
                 
         # Creating the selection for the other algorithms
         if algo_selection == 'Naive_Bayes':
@@ -443,6 +461,7 @@ def main():
                          " it is not a parametric algorithm," \
                          " thus it is not vulnerable to outliers " \
                          "but it is vulnerable to multicollinearity."
+            st.write(model_info)
 
         # Adding algorithm description
         #st.write(model_info)
@@ -465,47 +484,31 @@ def main():
             # When model has successfully run, will print prediction
             # You can use a dictionary or similar structure to make this output
             # more human interpretable.
+            # info about polarity and subjectivity
+            st.markdown("The prediction Probability to help the analyst with the confidence"
+                        " of predicting that particular class")
 
 
             with col1:
                 probs = predictor.predict_proba(vect_text)
 
-                # info about polarity and subjectivity
-                st.markdown("The prediction Probability to help the analyst with the confidence"
-                            " of predicting that particular class")
+
 
                 # Getting the confidence
                 st.success("Confidence : {}".format(np.max(probs)))
-
-                # Making the graphs
-                prob_df = pd.DataFrame(probs,  columns = predictor.classes_).T.reset_index()
-                p_df = prob_df.set_index('index')
-
-                st.bar_chart(p_df)
-                st.write('')
-
-
-
             with col2:
 
                 # creating polarity and subjectivity list
                 polarity_subjectivity = [TextBlob(tweet_text).sentiment[0], TextBlob(tweet_text).sentiment[1]]
 
-                # info about polarity and subjectivity
-                st.markdown("The Polarity helps tell if tweet is negative or positive "
-                            "subjectivity defining if fact or opinion")
-
                 st.success("Text Categorized as: {}".format(output[prediction[0]]))
 
-                # Making the graphs
-                data_set = {
-                    'measures': ['Polarity', 'Subjectivity'],
-                    'values': polarity_subjectivity
-                }
+            # Making the graphs
+            prob_df = pd.DataFrame(probs,  columns = predictor.classes_).T.reset_index()
+            p_df = prob_df.set_index('index')
 
-                df = pd.DataFrame(data_set)
-
-                st.bar_chart(df['values'])
+            st.bar_chart(p_df)
+            st.write('')
 
 
 
