@@ -28,6 +28,7 @@ from PIL import Image
 
 # Data dependencies
 import pandas as pd
+import numpy as np
 
 # Data plots
 from textblob import TextBlob
@@ -49,9 +50,41 @@ from nltk.corpus import stopwords
 news_vectorizer = open("resources/vectorizer_3.pkl","rb")
 tweet_cv = joblib.load(news_vectorizer) # loading your vectorizer from the pkl file
 
-# Load your raw data
+# hash tags negative class
 raw = pd.read_csv("resources/train.csv")
 
+# Load Anti class data
+anti_hash = pd.read_csv("https://raw.githubusercontent.com/MafikengZ/NLP-Tweet-Sentiment-Ananlysis/main/API/resources/data/df_anti_hashtags.csv")
+anti_retweet = pd.read_csv("https://raw.githubusercontent.com/MafikengZ/NLP-Tweet-Sentiment-Ananlysis/main/API/resources/data/df_Anti_retweets.csv")
+
+# Load Anti class data
+neutral_hash = pd.read_csv("https://raw.githubusercontent.com/MafikengZ/NLP-Tweet-Sentiment-Ananlysis/main/API/resources/data/df_Neutral_hashtags.csv")
+neutral_retweet = pd.read_csv("https://raw.githubusercontent.com/MafikengZ/NLP-Tweet-Sentiment-Ananlysis/main/API/resources/data/df_Neutral_retweet.csv")
+
+# Load Anti class data
+pro_hash = pd.read_csv("https://raw.githubusercontent.com/MafikengZ/NLP-Tweet-Sentiment-Ananlysis/main/API/resources/data/df_Pro_hashtags.csv")
+pro_retweet = pd.read_csv("https://raw.githubusercontent.com/MafikengZ/NLP-Tweet-Sentiment-Ananlysis/main/API/resources/data/df_Pro_retweets.csv")
+
+# Load Anti class data
+news_hash = pd.read_csv("https://raw.githubusercontent.com/MafikengZ/NLP-Tweet-Sentiment-Ananlysis/main/API/resources/data/df_News_hashtags.csv")
+news_retweet = pd.read_csv("https://raw.githubusercontent.com/MafikengZ/NLP-Tweet-Sentiment-Ananlysis/main/API/resources/data/df_News_retweets.csv")
+
+# Load word count dataframe
+token_df = pd.read_csv("https://raw.githubusercontent.com/MafikengZ/NLP-Tweet-Sentiment-Ananlysis/main/API/resources/data/df_token_ind.csv")
+
+
+
+# Making sentences for word  cloud retweets
+tweet_pro = " ".join([review for review in pro_retweet.Retweets if review is not np.nan])
+tweet_neutral = " ".join(review for review in neutral_retweet.Retweets if review is not np.nan)
+tweet_news = " ".join(review for review in news_retweet.Retweets if review is not np.nan)
+tweet_anti = " ".join(review for review in anti_retweet.Retweets if review is not np.nan)
+
+# Making sentences for word cloud hashtags
+hash_pro = " ".join([review for review in pro_hash.hashtags if review is not np.nan])
+hash_neutral = " ".join(review for review in neutral_hash.hashtags if review is not np.nan)
+hash_news = " ".join(review for review in news_hash.hashtags if review is not np.nan)
+hash_anti = " ".join(review for review in anti_hash.hashtags if review is not np.nan)
 
 
 # The main function where we will build the actual app
@@ -63,116 +96,227 @@ def main():
 
     st.title("Tweet Classifier")
 
-    st.subheader("Climate change tweet classification")
 
     # Creating sidebar with selection box -
     # you can create multiple pages this way
-    options = ["Prediction", "Information"]
+    options = ["Information", "Prediction"]
     selection = st.sidebar.selectbox("Choose Option", options)
-
     
 
         
     # Building out the "Information" page
     if selection == "Information":
 
+        # Create and generate a word cloud image:
+        wordcloud_pro = WordCloud(max_font_size=50, max_words=100,
+                                  background_color="white").generate(tweet_pro)
+        wordcloud_neutral = WordCloud(max_font_size=50, max_words=100
+                                      , background_color="white").generate(tweet_neutral)
+        wordcloud_news = WordCloud(max_font_size=50, max_words=100,
+                                   background_color="white").generate(tweet_news)
+        wordcloud_anti = WordCloud(max_font_size=50, max_words=100,
+                                   background_color="white").generate(tweet_anti)
 
+        # Create and generate a word cloud image:
+        wordcloud_pro1 = WordCloud(max_font_size=50, max_words=100,
+                                  background_color="white").generate(hash_pro)
+        wordcloud_neutral0 = WordCloud(max_font_size=50, max_words=100
+                                      , background_color="white").generate(hash_neutral)
+        wordcloud_news2 = WordCloud(max_font_size=50, max_words=100,
+                                   background_color="white").generate(hash_news)
+        wordcloud_antineg = WordCloud(max_font_size=50, max_words=100,
+                                   background_color="white").generate(hash_anti)
 
-        st.markdown("""
-                        | Sentiment     | Meaning       | 
-                        | ------------- |:-------------:| 
-                        | 1             | Pro believers |
-                        | 2             | News facts    |   
-                        | 0             | Neutral tweet |
-                        | -1            | Non believers  |    """)
-
-        # You can read a markdown file from supporting resources folder
-        st.markdown("Since the data is Imbalanced the use of sampling was the help for making good"
-                    " predictions for other classes. The Pro Class seems to be advantaged since it has more"
-                    " data points in the training of the model")
-
-        # Create two columns one for bar chart and one for raw data
-        # Create a bar chart for the column of sentiment value counts                
-        st.subheader("Sentiment count bar chart")
-        data = raw['sentiment'].value_counts()
-        st.bar_chart(data)
-
-        # Create a second column with raw data
-        st.subheader("Raw data")
-        #st.write(raw[['sentiment', 'message']]) # will write the df to the
-
-
-        # lowering tokens
-        raw['message'] = raw['message'].str.lower()
+        #copy of the data frame
+        df_token = token_df.copy()
 
 
 
-        # Removing Emojis
-        emoji_pattern = re.compile("["
-                                       u"\U0001F600-\U0001F64F"  # emoticons
-                                       u"\U0001F300-\U0001F5FF"  # symbols & pictographs
-                                       u"\U0001F680-\U0001F6FF"  # transport & map symbols
-                                       u"\U0001F1E0-\U0001F1FF"  # flags (iOS)
-                                       u"\U00002702-\U000027B0"
-                                       u"\U000024C2-\U0001F251"
-                                       u"\U0001f926-\U0001f937"
-                                       u'\U00010000-\U0010ffff'
-                                       u"\u200d"
-                                       u"\u2640-\u2642"
-                                       u"\u2600-\u2B55"
-                                       u"\u23cf"
-                                       u"\u23e9"
-                                       u"\u231a"
-                                       u"\u3030"
-                                       u"\ufe0f"
-                                       "]+", flags=re.UNICODE)
-
-        x = [emoji_pattern.sub(r'', string) for string in raw['message']]
-
-        raw['no_emoji'] = x
-
-        #remmoving the emojis
-        pattern_url = r'http[s]?://[A-Za-z0-9/.]+'
-        subs_url = r'url-web'
-        raw['clean_messages'] = raw['no_emoji'].replace(to_replace = pattern_url,
-                                                        value = subs_url, regex = True)
-
-        #remmoving the uknown charecters from words
-        pattern_url = r'[^A-Za-z ]'
-        subs_url = r''
-        raw['clean_messages'] = raw['clean_messages'].replace(to_replace = pattern_url,
-                                                              value = subs_url, regex = True)
-
-        #remmoving the digits
-        pattern_url = r'\d'
-        subs_url = r''
-        raw['clean_messages'] = raw['clean_messages'].replace(to_replace = pattern_url,
-                                                              value = subs_url, regex = True)
+        #making the class analysis
+        class_options = ["Class Pro", "Class News", "Class Neutral", "Class Anti"]
+        class_selection = st.sidebar.selectbox("Choose Class Analysis", class_options)
 
 
-        #remmoving the Re Tweets
-        pattern_url = r'rt\s'
-        subs_url = r''
-        raw['clean_messages'] = raw['clean_messages'].replace(to_replace = pattern_url,
-                                                              value = subs_url, regex = True)
+        if class_selection == "Class Pro":
+            # Create a bar chart for the column of sentiment value counts
+            st.subheader("Sentiment Class distribution")
+            data = raw['sentiment'].value_counts()
+            st.bar_chart(data)
+
+            # Creating a bar chart for the 25 most occurring words of class 1
+            class_1_data = df_token.sort_values('1', ascending = False).head(25)
+            data_set1 = {
+                'tokens': class_1_data['Unnamed: 0'],
+                'values': class_1_data['1']
+            }
+
+            df1 = pd.DataFrame(data_set1).set_index('tokens')
+            st.subheader("25 most common tokens in Class Pro")
+            st.bar_chart(df1)
+
+            st.subheader("Trending Tweets")
+            # Display the generated wordcloud for class 1:
+            fig, ax = plt.subplots()
+            ax.imshow(wordcloud_pro, interpolation='bilinear')
+            ax.axis('off')
+            st.pyplot(fig)
+
+            # showing raw hashtags data
+            if st.checkbox('Show trending tweets'):
+                st.subheader('Trending tweets and their counts')
+                st.write(pro_retweet.value_counts())
+
+            st.subheader("Trending Hashtags")
+            # Display the generated wordcloud for class 1:
+            fig, ax = plt.subplots()
+            ax.imshow(wordcloud_pro1, interpolation='bilinear')
+            ax.axis('off')
+            st.pyplot(fig)
+
+            # showing raw hashtags data
+            if st.checkbox('Show trending hashtags'):
+                st.subheader('Trending tweets and their counts')
+                st.write(pro_hash.value_counts())
+
+        if class_selection == "Class News":
+            # Create a bar chart for the column of sentiment value counts
+            st.subheader("Sentiment Class count bar chart")
+            data = raw['sentiment'].value_counts()
+            st.bar_chart(data)
 
 
-        # tokenizing the tweets
-        tokeniser = TreebankWordTokenizer()
-        raw['tokens'] = raw['clean_messages'].apply(tokeniser.tokenize)
+            # Creating a bar chart for the 25 most occurring words of class 2
+            class_2_data = df_token.sort_values('2', ascending = False).head(25)
 
-        st.write(raw)
+            data_set2 = {
+                'tokens': class_2_data['Unnamed: 0'],
+                'values': class_2_data['2']
+            }
+            st.subheader("25 Most common tokens in class News")
+            df2 = pd.DataFrame(data_set2).set_index('tokens')
+            st.bar_chart(df2)
 
 
+            # Display the generated wordcloud for class 2:
+            st.subheader("Trending Tweets")
+            fig, ax = plt.subplots()
+            ax.imshow(wordcloud_news, interpolation='bilinear')
+            ax.axis('off')
+            st.pyplot(fig)
 
-    # Building out the predication page
+            # showing raw retweets data
+            if st.checkbox('Show trending tweets'):
+                st.subheader('Trending tweets and their counts')
+                st.write(news_retweet.value_counts())
+
+            st.subheader("Trending Hashtags")
+            # Display the generated wordcloud for class 1:
+            fig, ax = plt.subplots()
+            ax.imshow(wordcloud_news2, interpolation='bilinear')
+            ax.axis('off')
+            st.pyplot(fig)
+
+            # showing raw hashtags data
+            if st.checkbox('Show trending hashtags'):
+                st.subheader('Trending tweets and their counts')
+                st.write(news_hash.value_counts())
+
+        if class_selection == "Class Neutral":
+            # Create a bar chart for the column of sentiment value counts
+            st.subheader("Sentiment Class count bar chart")
+            data = raw['sentiment'].value_counts()
+            st.bar_chart(data)
+
+
+            # Creating a bar chart for the 25 most occurring words of class 0
+            class_0_data = df_token.sort_values('0', ascending = False).head(25)
+            data_set0 = {
+                'tokens': class_0_data['Unnamed: 0'],
+                'values': class_0_data['0']
+            }
+            st.subheader("25 most common Tokens")
+            df0 = pd.DataFrame(data_set0).set_index('tokens')
+            st.bar_chart(df0)
+
+
+            # Display the generated wordcloud for class 1:
+            st.subheader("Trending Tweets")
+            fig, ax = plt.subplots()
+            ax.imshow(wordcloud_neutral, interpolation='bilinear')
+            ax.axis('off')
+            st.pyplot(fig)
+
+            #show trending retweets
+            if st.checkbox('Show trending tweets'):
+                st.subheader('Center Information data')
+                st.write(neutral_retweet.value_counts())
+
+            st.subheader("Trending Hashtags")
+            # Display the generated wordcloud for class 1:
+            fig, ax = plt.subplots()
+            ax.imshow(wordcloud_neutral0, interpolation='bilinear')
+            ax.axis('off')
+            st.pyplot(fig)
+
+            # show raw trending hashtags
+            if st.checkbox('Show trending hashtags'):
+                st.subheader('Center Information data')
+                st.write(neutral_hash.value_counts())
+
+        if class_selection == "Class Anti":
+            # Create a bar chart for the column of sentiment value counts
+            st.subheader("Sentiment Class count bar chart")
+            data = raw['sentiment'].value_counts()
+            st.bar_chart(data)
+
+
+            # Creating a bar chart for the 25 most occurring words of class -1
+            class_neg_data = df_token.sort_values('-1', ascending = False).head(25)
+
+            data_set_neg = {
+                'tokens': class_neg_data['Unnamed: 0'],
+                'values': class_neg_data['-1']
+            }
+            st.subheader("25 most common Tokens")
+            df_neg = pd.DataFrame(data_set_neg).set_index('tokens')
+            st.bar_chart(df_neg)
+
+
+            # Display the generated wordcloud for class -1:
+            st.subheader("Trending Tweets")
+            fig, ax = plt.subplots()
+            ax.imshow(wordcloud_anti, interpolation='bilinear')
+            ax.axis('off')
+            st.pyplot(fig)
+
+
+            if st.checkbox('Show trending tweets'):
+                st.subheader('Trending tweets and their counts')
+                st.write(anti_retweet.value_counts())
+
+            st.subheader("Trending Hashtags")
+            # Display the generated wordcloud for class 1:
+            fig, ax = plt.subplots()
+            ax.imshow(wordcloud_antineg, interpolation='bilinear')
+            ax.axis('off')
+            st.pyplot(fig)
+
+            if st.checkbox('Show trending hashtags and counts'):
+                st.subheader('Trending hashtags')
+                st.write(anti_hash.value_counts())
+
+            if st.checkbox('Show Rare words in the tweets'):
+                st.subheader('Trending hashtags')
+                st.write(df_token.head())
+
+
+# Building out the predication page
     if selection == "Prediction":
 
         
         # choosing the algorithm
         algo_option = ["Linear_Logistics", "SVM_Linear", "Naive_Bayes"]
         algo_selection = st.sidebar.selectbox("Choose An Algorithm of choice", algo_option)
-
 
 
         st.info("Predicting with a " + algo_selection +  " Model")
@@ -194,7 +338,7 @@ def main():
 
 
         if st.button("Classify"):
-            col1, col2 = st.beta_columns(2)
+            col1, col2 = st.columns(2)
             # Transforming user input with vectorizer
             vect_text = tweet_cv.transform([tweet_text]).toarray()
             # Load your .pkl file with the model of your choice + make predictions
@@ -202,35 +346,34 @@ def main():
             predictor = pred
             prediction = predictor.predict(vect_text)
 
-            output = {0 : 'Neutral tweet about climate change', 1 : 'Pro Believer in climate change',
-                      2 : 'News facts about climate change', -1 : 'Anti believer in climate change'}
+            output = {0 : 'Neutral tweet', 1 : 'Pro Believer',
+                      2 : 'News facts', -1 : 'Anti believer'}
+
+
                     
 
             # When model has successfully run, will print prediction
             # You can use a dictionary or similar structure to make this output
             # more human interpretable.
-            st.success("Text Categorized as: {}".format(output[prediction[0]]))
+
 
             with col1:
                 probs = predictor.predict_proba(vect_text)
 
                 # info about polarity and subjectivity
-                st.markdown("The Polarity and subjectivity plots helps verify the sentiment by either "
-                            "being a negative sentiment if the graph is negative and the subjectivity to help"
-                            " predict how factual ones statement is, sometimes it cannot get sentiments of "
-                            "words if there is word that helps with defining the tensity of the situation")
+                st.markdown("The prediction Probability to help the analyst with the confidence"
+                            " of predicting that particular class")
+
+                # Getting the confidence
+                st.success("Confidence : {}".format(np.max(probs)))
 
                 # Making the graphs
-                prob_df = pd.DataFrame(probs, columns =  predictor.classes_).T.reset_index()
+                prob_df = pd.DataFrame(probs,  columns = predictor.classes_).T.reset_index()
+                p_df = prob_df.set_index('index')
 
-                prob_df.columns = ['Classes', 'Probability']
+                st.bar_chart(p_df)
 
-                fig = alt.Chart(prob_df).mark_bar(color="Blue").encode(
-                    x='Classes',
-                    y='Probability'
-                ).properties(title="Prediction Probability plot").interactive()
 
-                st.altair_chart(fig)
 
             with col2:
 
@@ -238,26 +381,20 @@ def main():
                 polarity_subjectivity = [TextBlob(tweet_text).sentiment[0], TextBlob(tweet_text).sentiment[1]]
 
                 # info about polarity and subjectivity
-                st.markdown("The Polarity and subjectivity plots helps verify the sentiment by either "
-                            "being a negative sentiment if the graph is negative and the subjectivity to help"
-                            " predict how factual ones statement is, sometimes it cannot get sentiments of "
-                            "words if there is word that helps with defining the tensity of the situation")
+                st.markdown("The Polarity helps tell if tweet is negative or positive "
+                            "subjectivity defining if fact or opinion")
+
+                st.success("Text Categorized as: {}".format(output[prediction[0]]))
 
                 # Making the graphs
                 data_set = {
-                    'countries': ['Polarity', 'Subjectivity'],
+                    'measures': ['Polarity', 'Subjectivity'],
                     'values': polarity_subjectivity
                 }
 
                 df = pd.DataFrame(data_set)
 
-                line = alt.Chart(df).mark_bar(color="Blue").encode(
-                    x='countries',
-                    y='values'
-                ).properties(width = 450, height = 350, title = "Polarity and Subjectivity plot").interactive()
-
-                st.altair_chart(line)
-
+                st.bar_chart(df['values'])
 
 
 
